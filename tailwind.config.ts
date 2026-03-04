@@ -47,6 +47,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        generate: {
+          DEFAULT: "hsl(var(--generate))",
+          hover: "hsl(var(--generate-hover))",
+          foreground: "hsl(var(--generate-foreground))",
+        },
+        player: {
+          DEFAULT: "hsl(var(--player-bg))",
+        },
+        dot: {
+          1: "hsl(var(--dot-1))",
+          2: "hsl(var(--dot-2))",
+          3: "hsl(var(--dot-3))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
