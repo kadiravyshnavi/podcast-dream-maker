@@ -5,14 +5,32 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
     if (!topic.trim()) return;
     setLoading(true);
     setResult(null);
-    setTimeout(() => {
+    setAudioUrl(null);
+    try {
+      const response = await fetch(
+        "http://localhost:5678/webhook-test/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: topic }),
+        }
+      );
+      if (!response.ok) throw new Error("Request failed");
+      const data = await response.json();
+      setAudioUrl(data.audioFile);
+      setResult("🎧 Podcast is ready! Click play to listen");
+      setTopic("");
+    } catch {
+      setResult("😔 Oops! Something went wrong. Please try again");
+    } finally {
       setLoading(false);
-      setResult("🎉 Feature coming soon!");
-    }, 2500);
+    }
   };
 
   return (
@@ -51,15 +69,23 @@ const Index = () => {
             🔊 Generate Podcast
           </button>
 
-          <div className="rounded-xl bg-player p-6 min-h-[80px] flex items-center justify-center">
+          <div className="rounded-xl bg-player p-6 min-h-[80px] flex flex-col items-center justify-center gap-4">
             {loading ? (
-              <div className="flex gap-2">
-                <span className="w-3 h-3 rounded-full bg-dot-1 dot-bounce-1" />
-                <span className="w-3 h-3 rounded-full bg-dot-2 dot-bounce-2" />
-                <span className="w-3 h-3 rounded-full bg-dot-3 dot-bounce-3" />
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex gap-2">
+                  <span className="w-3 h-3 rounded-full bg-dot-1 dot-bounce-1" />
+                  <span className="w-3 h-3 rounded-full bg-dot-2 dot-bounce-2" />
+                  <span className="w-3 h-3 rounded-full bg-dot-3 dot-bounce-3" />
+                </div>
+                <p className="text-muted-foreground text-sm">Creating podcast... please wait!</p>
               </div>
             ) : result ? (
-              <p className="text-foreground font-semibold text-lg animate-fade-in">{result}</p>
+              <>
+                <p className="text-foreground font-semibold text-lg animate-fade-in">{result}</p>
+                {audioUrl && (
+                  <audio controls src={audioUrl} className="w-full mt-2 rounded-lg" />
+                )}
+              </>
             ) : (
               <p className="text-muted-foreground text-sm">🎧 Podcast will appear here</p>
             )}
