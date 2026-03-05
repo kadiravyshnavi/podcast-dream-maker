@@ -1,39 +1,64 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { addToHistory } from "@/lib/podcastHistory";
+
+const DURATIONS = [
+  { label: "Short", value: "short", desc: "~2 min" },
+  { label: "Medium", value: "medium", desc: "~5 min" },
+  { label: "Long", value: "long", desc: "~10 min" },
+];
 
 const Index = () => {
   const [topic, setTopic] = useState("");
+  const [duration, setDuration] = useState("medium");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [script, setScript] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
     setLoading(true);
     setResult(null);
     setAudioUrl(null);
+    setScript(null);
+    const currentTopic = topic;
     try {
       const response = await fetch(
         "https://vyshnavikadira666.app.n8n.cloud/webhook-test/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: topic }),
+          body: JSON.stringify({ text: currentTopic, duration }),
         }
       );
       if (!response.ok) throw new Error("Request failed");
       const contentType = response.headers.get("content-type") || "";
+      let newAudioUrl: string | null = null;
+      let newScript: string | null = null;
+
       if (contentType.includes("application/json")) {
         const data = await response.json();
-        setAudioUrl(data.audioFile);
+        newAudioUrl = data.audioFile || data.audioUrl || null;
+        newScript = data.script || data.transcript || data.text || null;
       } else {
-        // Response is raw audio data
         const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        setAudioUrl(blobUrl);
+        newAudioUrl = URL.createObjectURL(blob);
       }
+
+      setAudioUrl(newAudioUrl);
+      setScript(newScript);
       setResult("🎧 Podcast is ready! Click play to listen");
       setTopic("");
+
+      addToHistory({
+        id: crypto.randomUUID(),
+        topic: currentTopic,
+        duration: DURATIONS.find((d) => d.value === duration)?.label || duration,
+        script: newScript,
+        audioUrl: newAudioUrl,
+        createdAt: new Date().toISOString(),
+      });
     } catch {
       setResult("😔 Oops! Something went wrong. Please try again");
     } finally {
@@ -54,6 +79,7 @@ const Index = () => {
         </div>
 
         <div className="bg-card rounded-2xl p-6 sm:p-8 shadow-sm border border-border space-y-5">
+          {/* Topic input */}
           <div>
             <label htmlFor="topic" className="block text-sm font-semibold text-foreground mb-2">
               Topic
@@ -69,6 +95,30 @@ const Index = () => {
             />
           </div>
 
+          {/* Duration selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Podcast Length
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {DURATIONS.map((d) => (
+                <button
+                  key={d.value}
+                  onClick={() => setDuration(d.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all ${
+                    duration === d.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  {d.label}
+                  <span className="block text-xs font-normal mt-0.5 opacity-70">{d.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Generate button */}
           <button
             onClick={handleGenerate}
             disabled={loading || !topic.trim()}
@@ -77,6 +127,7 @@ const Index = () => {
             🔊 Generate Podcast
           </button>
 
+          {/* Player / Result area */}
           <div className="rounded-xl bg-player p-6 min-h-[80px] flex flex-col items-center justify-center gap-4">
             {loading ? (
               <div className="flex flex-col items-center gap-3">
@@ -107,6 +158,26 @@ const Index = () => {
               <p className="text-muted-foreground text-sm">🎧 Podcast will appear here</p>
             )}
           </div>
+
+          {/* Script display */}
+          {script && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-foreground">📜 Generated Script</h3>
+              <div className="rounded-xl bg-muted p-4 text-sm text-foreground whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed">
+                {script}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* History link */}
+        <div className="text-center">
+          <Link
+            to="/history"
+            className="text-primary font-semibold text-sm hover:underline transition-colors"
+          >
+            📚 View Podcast History →
+          </Link>
         </div>
       </div>
     </div>
