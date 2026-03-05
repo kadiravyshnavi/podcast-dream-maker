@@ -22,8 +22,16 @@ const Index = () => {
         }
       );
       if (!response.ok) throw new Error("Request failed");
-      const data = await response.json();
-      setAudioUrl(data.audioFile);
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        setAudioUrl(data.audioFile);
+      } else {
+        // Response is raw audio data
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        setAudioUrl(blobUrl);
+      }
       setResult("🎧 Podcast is ready! Click play to listen");
       setTopic("");
     } catch {
