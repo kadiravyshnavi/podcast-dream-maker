@@ -91,7 +91,16 @@ const Index = () => {
               <>
                 <p className="text-foreground font-semibold text-lg animate-fade-in">{result}</p>
                 {audioUrl && (
-                  <audio controls src={audioUrl} className="w-full mt-2 rounded-lg" />
+                  <div className="w-full space-y-3">
+                    <audio controls src={audioUrl} className="w-full rounded-lg" />
+                    <a
+                      href={audioUrl}
+                      download="podcast.wav"
+                      className="flex items-center justify-center gap-2 w-full rounded-xl bg-secondary py-2.5 font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
+                    >
+                      ⬇️ Download Podcast
+                    </a>
+                  </div>
                 )}
               </>
             ) : (
