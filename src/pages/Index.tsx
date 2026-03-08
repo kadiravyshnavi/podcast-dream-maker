@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { addToHistory } from "@/lib/podcastHistory";
 import { Progress } from "@/components/ui/progress";
+import { Twitter, Facebook, Linkedin, Link as LinkIcon, Check } from "lucide-react";
+import ShareButtons from "@/components/ShareButtons";
 
 const LOADING_STEPS = [
   { label: "Generating Script...", icon: "📝" },
@@ -23,6 +25,7 @@ const Index = () => {
   const [result, setResult] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [script, setScript] = useState<string | null>(null);
+  const [lastTopic, setLastTopic] = useState("");
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -61,6 +64,7 @@ const Index = () => {
       setAudioUrl(newAudioUrl);
       setScript(newScript);
       setResult("🎧 Podcast is ready! Click play to listen");
+      setLastTopic(currentTopic);
       setTopic("");
 
       addToHistory({
@@ -180,6 +184,7 @@ const Index = () => {
                     >
                       ⬇️ Download Podcast
                     </a>
+                    <ShareButtons topic={lastTopic} />
                   </div>
                 )}
               </>
