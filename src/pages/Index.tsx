@@ -56,11 +56,11 @@ const Index = () => {
 
     try {
       const response = await fetch(
-        "https://vyshnavikadira666.app.n8n.cloud/webhook-test/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
+        "https://ai-podcast-generator-n8n.onrender.com/webhook/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentTopic, duration, voiceStyle, voice }),
+          body: JSON.stringify({ topic: currentTopic, length: duration, voiceStyle, voice }),
         }
       );
       if (!response.ok) throw new Error("Request failed");
