@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { addToHistory } from "@/lib/podcastHistory";
 import { Progress } from "@/components/ui/progress";
+import { Twitter, Facebook, Linkedin, Link as LinkIcon, Check } from "lucide-react";
 
 const LOADING_STEPS = [
   { label: "Generating Script...", icon: "📝" },
@@ -180,6 +181,7 @@ const Index = () => {
                     >
                       ⬇️ Download Podcast
                     </a>
+                    <ShareButtons topic={topic || "my podcast"} />
                   </div>
                 )}
               </>
