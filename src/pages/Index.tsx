@@ -196,7 +196,8 @@ const Index = () => {
               ))}
             </div>
           </div>
-
+          {/* Generate button */}
+          <button
             onClick={handleGenerate}
             disabled={loading || !topic.trim()}
             className="w-full rounded-xl bg-generate py-3 font-bold text-generate-foreground hover:bg-generate-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base"
