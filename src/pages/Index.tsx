@@ -143,13 +143,29 @@ const Index = () => {
           {/* Player / Result area */}
           <div className="rounded-xl bg-player p-6 min-h-[80px] flex flex-col items-center justify-center gap-4">
             {loading ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex gap-2">
-                  <span className="w-3 h-3 rounded-full bg-dot-1 dot-bounce-1" />
-                  <span className="w-3 h-3 rounded-full bg-dot-2 dot-bounce-2" />
-                  <span className="w-3 h-3 rounded-full bg-dot-3 dot-bounce-3" />
+              <div className="flex flex-col items-center gap-4 w-full animate-fade-in">
+                <div className="w-full space-y-3">
+                  {LOADING_STEPS.map((step, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-2 text-sm transition-all duration-300 ${
+                        i < loadingStep
+                          ? "text-primary opacity-60"
+                          : i === loadingStep
+                          ? "text-foreground font-semibold"
+                          : "text-muted-foreground opacity-40"
+                      }`}
+                    >
+                      <span>{i < loadingStep ? "✅" : step.icon}</span>
+                      <span>{step.label}</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-muted-foreground text-sm">Creating podcast... please wait!</p>
+                <Progress
+                  value={((loadingStep + 1) / LOADING_STEPS.length) * 100}
+                  className="h-2"
+                />
+                <p className="text-muted-foreground text-xs">This may take a moment...</p>
               </div>
             ) : result ? (
               <>
