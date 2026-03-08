@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { addToHistory } from "@/lib/podcastHistory";
+import { Progress } from "@/components/ui/progress";
+
+const LOADING_STEPS = [
+  { label: "Generating Script...", icon: "📝" },
+  { label: "Converting to Audio...", icon: "🔊" },
+  { label: "Finalizing Podcast...", icon: "✨" },
+];
 
 const DURATIONS = [
   { label: "Short", value: "short", desc: "~2 min" },
