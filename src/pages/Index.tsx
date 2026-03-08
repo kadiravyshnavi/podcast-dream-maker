@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { addToHistory } from "@/lib/podcastHistory";
+import { Progress } from "@/components/ui/progress";
+
+const LOADING_STEPS = [
+  { label: "Generating Script...", icon: "📝" },
+  { label: "Converting to Audio...", icon: "🔊" },
+  { label: "Finalizing Podcast...", icon: "✨" },
+];
 
 const DURATIONS = [
   { label: "Short", value: "short", desc: "~2 min" },
@@ -12,6 +19,7 @@ const Index = () => {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState("medium");
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [script, setScript] = useState<string | null>(null);
@@ -19,10 +27,14 @@ const Index = () => {
   const handleGenerate = async () => {
     if (!topic.trim()) return;
     setLoading(true);
-    setResult(null);
-    setAudioUrl(null);
-    setScript(null);
+    setLoadingStep(0);
     const currentTopic = topic;
+
+    // Simulate step progression
+    const stepInterval = setInterval(() => {
+      setLoadingStep((prev) => (prev < LOADING_STEPS.length - 1 ? prev + 1 : prev));
+    }, 4000);
+
     try {
       const response = await fetch(
         "https://vyshnavikadira666.app.n8n.cloud/webhook-test/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
@@ -62,6 +74,7 @@ const Index = () => {
     } catch {
       setResult("😔 Oops! Something went wrong. Please try again");
     } finally {
+      clearInterval(stepInterval);
       setLoading(false);
     }
   };
@@ -130,13 +143,29 @@ const Index = () => {
           {/* Player / Result area */}
           <div className="rounded-xl bg-player p-6 min-h-[80px] flex flex-col items-center justify-center gap-4">
             {loading ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex gap-2">
-                  <span className="w-3 h-3 rounded-full bg-dot-1 dot-bounce-1" />
-                  <span className="w-3 h-3 rounded-full bg-dot-2 dot-bounce-2" />
-                  <span className="w-3 h-3 rounded-full bg-dot-3 dot-bounce-3" />
+              <div className="flex flex-col items-center gap-4 w-full animate-fade-in">
+                <div className="w-full space-y-3">
+                  {LOADING_STEPS.map((step, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-2 text-sm transition-all duration-300 ${
+                        i < loadingStep
+                          ? "text-primary opacity-60"
+                          : i === loadingStep
+                          ? "text-foreground font-semibold"
+                          : "text-muted-foreground opacity-40"
+                      }`}
+                    >
+                      <span>{i < loadingStep ? "✅" : step.icon}</span>
+                      <span>{step.label}</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-muted-foreground text-sm">Creating podcast... please wait!</p>
+                <Progress
+                  value={((loadingStep + 1) / LOADING_STEPS.length) * 100}
+                  className="h-2"
+                />
+                <p className="text-muted-foreground text-xs">This may take a moment...</p>
               </div>
             ) : result ? (
               <>
