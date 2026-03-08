@@ -24,10 +24,18 @@ const VOICE_STYLES = [
   { label: "Educational", value: "educational", icon: "🎓", desc: "Clear & informative" },
 ];
 
+const VOICES = [
+  { label: "Male", value: "male", icon: "🧑" },
+  { label: "Female", value: "female", icon: "👩" },
+  { label: "Storytelling", value: "storytelling", icon: "📖" },
+  { label: "News Anchor", value: "news-anchor", icon: "📺" },
+];
+
 const Index = () => {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState("medium");
   const [voiceStyle, setVoiceStyle] = useState("casual");
+  const [voice, setVoice] = useState("male");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<string | null>(null);
@@ -52,7 +60,7 @@ const Index = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentTopic, duration, voiceStyle }),
+          body: JSON.stringify({ text: currentTopic, duration, voiceStyle, voice }),
         }
       );
       if (!response.ok) throw new Error("Request failed");
@@ -166,6 +174,29 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Voice selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Voice
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICES.map((v) => (
+                <button
+                  key={v.value}
+                  onClick={() => setVoice(v.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all flex items-center gap-2 ${
+                    voice === v.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span>{v.icon}</span>
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Generate button */}
           <button
             onClick={handleGenerate}
             disabled={loading || !topic.trim()}
