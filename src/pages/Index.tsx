@@ -56,7 +56,7 @@ const Index = () => {
 
     try {
       const response = await fetch(
-        "https://ai-podcast-generator-n8n.onrender.com/webhook/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
+        "https://vyshnavikadira666.app.n8n.cloud/webhook/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
