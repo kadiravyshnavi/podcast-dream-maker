@@ -63,6 +63,7 @@ const Index = () => {
       setAudioUrl(newAudioUrl);
       setScript(newScript);
       setResult("🎧 Podcast is ready! Click play to listen");
+      setLastTopic(currentTopic);
       setTopic("");
 
       addToHistory({
@@ -182,7 +183,7 @@ const Index = () => {
                     >
                       ⬇️ Download Podcast
                     </a>
-                    <ShareButtons topic={topic || "my podcast"} />
+                    <ShareButtons topic={lastTopic} />
                   </div>
                 )}
               </>
