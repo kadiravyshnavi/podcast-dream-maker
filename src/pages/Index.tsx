@@ -24,10 +24,18 @@ const VOICE_STYLES = [
   { label: "Educational", value: "educational", icon: "🎓", desc: "Clear & informative" },
 ];
 
+const VOICES = [
+  { label: "Male", value: "male", icon: "🧑" },
+  { label: "Female", value: "female", icon: "👩" },
+  { label: "Storytelling", value: "storytelling", icon: "📖" },
+  { label: "News Anchor", value: "news-anchor", icon: "📺" },
+];
+
 const Index = () => {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState("medium");
   const [voiceStyle, setVoiceStyle] = useState("casual");
+  const [voice, setVoice] = useState("male");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<string | null>(null);
@@ -52,7 +60,7 @@ const Index = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentTopic, duration, voiceStyle }),
+          body: JSON.stringify({ text: currentTopic, duration, voiceStyle, voice }),
         }
       );
       if (!response.ok) throw new Error("Request failed");
