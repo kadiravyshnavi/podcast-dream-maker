@@ -1,73 +1,112 @@
-# Welcome to your Lovable project
+# 🎙️ AI Podcast Generator
 
-## Project info
+An AI-powered web application that generates podcast scripts and converts them into audio automatically from a given topic.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Users can select the podcast topic, podcast length, and voice style. The system then generates a complete podcast script using AI and converts it into audio using a text-to-speech engine.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Features
 
-**Use Lovable**
+* Generate podcast scripts from any topic
+* Choose podcast length (Short / Medium / Long)
+* Select voice style for narration
+* Convert podcast scripts into audio automatically
+* Download the generated podcast audio
+* Fully automated AI workflow
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🧠 How It Works
 
-**Use your preferred IDE**
+1. User enters a topic and podcast preferences.
+2. The frontend sends a request to an automation workflow.
+3. The workflow generates a podcast script using AI.
+4. The script is converted into speech using a text-to-speech engine.
+5. The generated podcast audio is returned to the user.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Tech Stack
 
-Follow these steps:
+### Frontend
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+* React
+* Vite
+* TypeScript
+* Tailwind CSS
+* shadcn-ui
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Backend & Automation
 
-# Step 3: Install the necessary dependencies.
-npm i
+* n8n (workflow automation)
+* Google Gemini API (script generation)
+* Murf AI (text-to-speech)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Deployment
+
+* Frontend hosted on Vercel
+* Backend hosted on Render
+
+---
+
+## 🏗️ System Architecture
+
+Frontend (React + Vite)
+⬇
+API Request
+⬇
+n8n Automation Workflow
+⬇
+Gemini AI → Generate Podcast Script
+⬇
+Murf AI → Convert Script to Audio
+⬇
+Return Podcast Audio to User
+
+---
+
+## 💻 Local Development
+
+Clone the repository:
+
+```bash
+git clone https://github.com/kadiravyshnavi/podcast-dream-maker.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd podcast-dream-maker
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🌐 Live Demo
 
-**Use GitHub Codespaces**
+Coming soon
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🙌 Acknowledgements
 
-This project is built with:
+The frontend UI was initially scaffolded using **Lovable AI** and further customized using React and Tailwind CSS.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 👩‍💻 Author
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Vyshnavi Kadira
+AI & Automation Enthusiast
