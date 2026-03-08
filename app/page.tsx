@@ -1,65 +1,275 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { Twitter, Facebook, Linkedin, Link as LinkIcon, Check } from "lucide-react";
 
-export default function Home() {
+const LOADING_STEPS = [
+  { label: "Generating Script...", icon: "📝" },
+  { label: "Converting to Audio...", icon: "🔊" },
+  { label: "Finalizing Podcast...", icon: "✨" },
+];
+
+const DURATIONS = [
+  { label: "Short", value: "short", desc: "~2 min" },
+  { label: "Medium", value: "medium", desc: "~5 min" },
+  { label: "Long", value: "long", desc: "~10 min" },
+];
+
+const VOICE_STYLES = [
+  { label: "Casual", value: "casual", icon: "😎", desc: "Relaxed & friendly" },
+  { label: "Professional", value: "professional", icon: "👔", desc: "Formal & polished" },
+  { label: "Storytelling", value: "storytelling", icon: "📖", desc: "Narrative & engaging" },
+  { label: "Educational", value: "educational", icon: "🎓", desc: "Clear & informative" },
+];
+
+const VOICES = [
+  { label: "Male", value: "male", icon: "🧑" },
+  { label: "Female", value: "female", icon: "👩" },
+  { label: "Storytelling", value: "storytelling", icon: "📖" },
+  { label: "News Anchor", value: "news-anchor", icon: "📺" },
+];
+
+const Index = () => {
+  const [topic, setTopic] = useState("");
+  const [duration, setDuration] = useState("medium");
+  const [voiceStyle, setVoiceStyle] = useState("casual");
+  const [voice, setVoice] = useState("male");
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [result, setResult] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [script, setScript] = useState<string | null>(null);
+  const [lastTopic, setLastTopic] = useState("");
+
+  const handleGenerate = async () => {
+    if (!topic.trim()) return;
+    setLoading(true);
+    setLoadingStep(0);
+    const currentTopic = topic;
+
+    // Simulate step progression
+    const stepInterval = setInterval(() => {
+      setLoadingStep((prev) => (prev < LOADING_STEPS.length - 1 ? prev + 1 : prev));
+    }, 4000);
+
+    try {
+      const response = await fetch(
+        "https://ai-podcast-generator-n8n.onrender.com/webhook/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic: currentTopic, length: duration, voiceStyle, voice }),
+        }
+      );
+      if (!response.ok) throw new Error("Request failed");
+      const contentType = response.headers.get("content-type") || "";
+      let newAudioUrl: string | null = null;
+      let newScript: string | null = null;
+
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        newAudioUrl = data.audioFile || data.audioUrl || null;
+        newScript = data.script || data.transcript || data.text || null;
+      } else {
+        const blob = await response.blob();
+        newAudioUrl = URL.createObjectURL(blob);
+      }
+
+      setAudioUrl(newAudioUrl);
+      setScript(newScript);
+      setResult("🎧 Podcast is ready! Click play to listen");
+      setLastTopic(currentTopic);
+      setTopic("");
+    } catch {
+      setResult("😔 Oops! Something went wrong. Please try again");
+    } finally {
+      clearInterval(stepInterval);
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-lg space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground">
+            🎙️ Podcast Generator
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground text-sm">
+            Enter a topic and let the magic happen
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        <div className="bg-card rounded-2xl p-6 sm:p-8 shadow-sm border border-border space-y-5">
+          {/* Topic input */}
+          <div>
+            <label htmlFor="topic" className="block text-sm font-semibold text-foreground mb-2">
+              Topic
+            </label>
+            <input
+              id="topic"
+              type="text"
+              placeholder="Type podcast topic here..."
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
+              className="w-full rounded-xl border border-border bg-input px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          {/* Duration selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Podcast Length
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {DURATIONS.map((d) => (
+                <button
+                  key={d.value}
+                  onClick={() => setDuration(d.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all ${
+                    duration === d.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  {d.label}
+                  <span className="block text-xs font-normal mt-0.5 opacity-70">{d.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Voice style selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Voice Style
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICE_STYLES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setVoiceStyle(s.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all text-left ${
+                    voiceStyle === s.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span className="mr-1">{s.icon}</span> {s.label}
+                  <span className="block text-xs font-normal mt-0.5 opacity-70">{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Voice selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Voice
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICES.map((v) => (
+                <button
+                  key={v.value}
+                  onClick={() => setVoice(v.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all flex items-center gap-2 ${
+                    voice === v.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span>{v.icon}</span>
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Generate button */}
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !topic.trim()}
+            className="w-full rounded-xl bg-generate py-3 font-bold text-generate-foreground hover:bg-generate-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base"
           >
-            Documentation
-          </a>
+            🔊 Generate Podcast
+          </button>
+
+          {/* Player / Result area */}
+          <div className="rounded-xl bg-player p-6 min-h-[80px] flex flex-col items-center justify-center gap-4">
+            {loading ? (
+              <div className="flex flex-col items-center gap-4 w-full animate-fade-in">
+                <div className="w-full space-y-3">
+                  {LOADING_STEPS.map((step, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-2 text-sm transition-all duration-300 ${
+                        i < loadingStep
+                          ? "text-primary opacity-60"
+                          : i === loadingStep
+                          ? "text-foreground font-semibold"
+                          : "text-muted-foreground opacity-40"
+                      }`}
+                    >
+                      <span>{i < loadingStep ? "✅" : step.icon}</span>
+                      <span>{step.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-muted-foreground text-xs">This may take a moment...</p>
+              </div>
+            ) : result ? (
+              <>
+                <p className="text-foreground font-semibold text-lg animate-fade-in">{result}</p>
+                {audioUrl && (
+                  <div className="w-full space-y-3">
+                    <audio controls src={audioUrl} className="w-full rounded-lg" />
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(audioUrl);
+                          const blob = await res.blob();
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "podcast.wav";
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        } catch {
+                          window.open(audioUrl, "_blank");
+                        }
+                      }}
+                      className="flex items-center justify-center gap-2 w-full rounded-xl bg-secondary py-2.5 font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
+                    >
+                      ⬇️ Download Podcast
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-muted-foreground text-sm">🎧 Podcast will appear here</p>
+            )}
+          </div>
+
+          {/* Script display */}
+          {script && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-foreground">📜 Generated Script</h3>
+              <div className="rounded-xl bg-muted p-4 text-sm text-foreground whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed">
+                {script}
+              </div>
+            </div>
+          )}
         </div>
-      </main>
+
+        {/* History link */}
+        <div className="text-center">
+        <Link href="/">Back</Link>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Index;
