@@ -1,35 +1,41 @@
 # 🎙️ AI Podcast Generator
 
-An AI-powered web application that generates podcast scripts and converts them into audio automatically from a given topic.
+An AI-powered web application that automatically generates podcast scripts and converts them into audio from a given topic.
 
 Users can select the podcast topic, podcast length, and voice style. The system then generates a complete podcast script using AI and converts it into audio using a text-to-speech engine.
 
 ---
 
-## 🚀 Features
+# 🚀 Live Demo
+
+https://podcast-dream-maker.vercel.app
+
+---
+
+# 🚀 Features
 
 * Generate podcast scripts from any topic
 * Choose podcast length (Short / Medium / Long)
 * Select voice style for narration
 * Convert podcast scripts into audio automatically
 * Download the generated podcast audio
-* Fully automated AI workflow
+* Fully automated AI workflow using n8n
 
 ---
 
-## 🧠 How It Works
+# 🧠 How It Works
 
 1. User enters a topic and podcast preferences.
-2. The frontend sends a request to an automation workflow.
-3. The workflow generates a podcast script using AI.
+2. The frontend sends a POST request to an n8n webhook.
+3. The n8n workflow generates a podcast script using AI.
 4. The script is converted into speech using a text-to-speech engine.
 5. The generated podcast audio is returned to the user.
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-### Frontend
+## Frontend
 
 * React
 * Vite
@@ -37,76 +43,62 @@ Users can select the podcast topic, podcast length, and voice style. The system 
 * Tailwind CSS
 * shadcn-ui
 
-### Backend & Automation
+## Backend & Automation
 
-* n8n (workflow automation)
-* Google Gemini API (script generation)
+* n8n Cloud (workflow automation)
+* Google Gemini API (AI script generation)
 * Murf AI (text-to-speech)
 
-### Deployment
+## Deployment
 
 * Frontend hosted on Vercel
-* Backend hosted on Render
+* Backend automation powered by n8n Cloud Webhooks
 
 ---
 
-## 🏗️ System Architecture
+# 🏗️ System Architecture
 
 Frontend (React + Vite)
 ⬇
-API Request
+POST Request (Webhook)
 ⬇
-n8n Automation Workflow
+n8n Cloud Automation Workflow
 ⬇
 Gemini AI → Generate Podcast Script
 ⬇
 Murf AI → Convert Script to Audio
 ⬇
-Return Podcast Audio to User
+Return Podcast Audio URL to Frontend
 
 ---
 
-## 💻 Local Development
+# 💻 Local Development
 
 Clone the repository:
 
-```bash
 git clone https://github.com/kadiravyshnavi/podcast-dream-maker.git
-```
 
 Navigate to the project directory:
 
-```bash
 cd podcast-dream-maker
-```
 
 Install dependencies:
 
-```bash
 npm install
-```
 
 Run the development server:
 
-```bash
 npm run dev
-```
 
 ---
 
-## 🌐 Live Demo
+# 🙌 Acknowledgements
 
-Coming soon
-
----
-
-## 🙌 Acknowledgements
-
-The frontend UI was initially scaffolded using **Lovable AI** and further customized using React and Tailwind CSS.
+The frontend UI was initially scaffolded using Lovable AI and further customized using React and Tailwind CSS.
 
 ---
 
-## 👩‍💻 Author
+# 👩‍💻 Author
 
 Vyshnavi Kadira
 AI & Automation Enthusiast
