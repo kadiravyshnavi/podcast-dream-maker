@@ -174,7 +174,29 @@ const Index = () => {
             </div>
           </div>
 
-          <button
+          {/* Voice selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Voice
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICES.map((v) => (
+                <button
+                  key={v.value}
+                  onClick={() => setVoice(v.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all flex items-center gap-2 ${
+                    voice === v.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span>{v.icon}</span>
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
             onClick={handleGenerate}
             disabled={loading || !topic.trim()}
             className="w-full rounded-xl bg-generate py-3 font-bold text-generate-foreground hover:bg-generate-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base"
