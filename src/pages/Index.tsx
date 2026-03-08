@@ -12,6 +12,7 @@ const Index = () => {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState("medium");
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [script, setScript] = useState<string | null>(null);
