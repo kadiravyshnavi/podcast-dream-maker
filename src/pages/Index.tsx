@@ -238,13 +238,27 @@ const Index = () => {
                 {audioUrl && (
                   <div className="w-full space-y-3">
                     <audio controls src={audioUrl} className="w-full rounded-lg" />
-                    <a
-                      href={audioUrl}
-                      download="podcast.wav"
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(audioUrl);
+                          const blob = await res.blob();
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = "podcast.wav";
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                        } catch {
+                          window.open(audioUrl, "_blank");
+                        }
+                      }}
                       className="flex items-center justify-center gap-2 w-full rounded-xl bg-secondary py-2.5 font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
                     >
                       ⬇️ Download Podcast
-                    </a>
+                    </button>
                     <ShareButtons topic={lastTopic} />
                   </div>
                 )}
