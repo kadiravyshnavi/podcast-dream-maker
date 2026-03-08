@@ -27,10 +27,14 @@ const Index = () => {
   const handleGenerate = async () => {
     if (!topic.trim()) return;
     setLoading(true);
-    setResult(null);
-    setAudioUrl(null);
-    setScript(null);
+    setLoadingStep(0);
     const currentTopic = topic;
+
+    // Simulate step progression
+    const stepInterval = setInterval(() => {
+      setLoadingStep((prev) => (prev < LOADING_STEPS.length - 1 ? prev + 1 : prev));
+    }, 4000);
+
     try {
       const response = await fetch(
         "https://vyshnavikadira666.app.n8n.cloud/webhook-test/9d1a248d-0713-4ef7-b916-14f5efb02ab9",
@@ -70,6 +74,7 @@ const Index = () => {
     } catch {
       setResult("😔 Oops! Something went wrong. Please try again");
     } finally {
+      clearInterval(stepInterval);
       setLoading(false);
     }
   };
