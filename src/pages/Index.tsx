@@ -17,9 +17,17 @@ const DURATIONS = [
   { label: "Long", value: "long", desc: "~10 min" },
 ];
 
+const VOICE_STYLES = [
+  { label: "Casual", value: "casual", icon: "😎", desc: "Relaxed & friendly" },
+  { label: "Professional", value: "professional", icon: "👔", desc: "Formal & polished" },
+  { label: "Storytelling", value: "storytelling", icon: "📖", desc: "Narrative & engaging" },
+  { label: "Educational", value: "educational", icon: "🎓", desc: "Clear & informative" },
+];
+
 const Index = () => {
   const [topic, setTopic] = useState("");
   const [duration, setDuration] = useState("medium");
+  const [voiceStyle, setVoiceStyle] = useState("casual");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<string | null>(null);
@@ -44,7 +52,7 @@ const Index = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentTopic, duration }),
+          body: JSON.stringify({ text: currentTopic, duration, voiceStyle }),
         }
       );
       if (!response.ok) throw new Error("Request failed");
@@ -135,7 +143,29 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Generate button */}
+          {/* Voice style selector */}
+          <div>
+            <label className="block text-sm font-semibold text-foreground mb-2">
+              Voice Style
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICE_STYLES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setVoiceStyle(s.value)}
+                  className={`rounded-xl border-2 py-2.5 px-3 text-sm font-semibold transition-all text-left ${
+                    voiceStyle === s.value
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-input text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span className="mr-1">{s.icon}</span> {s.label}
+                  <span className="block text-xs font-normal mt-0.5 opacity-70">{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={handleGenerate}
             disabled={loading || !topic.trim()}
