@@ -24,6 +24,7 @@ const Index = () => {
   const [result, setResult] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [script, setScript] = useState<string | null>(null);
+  const [lastTopic, setLastTopic] = useState("");
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
