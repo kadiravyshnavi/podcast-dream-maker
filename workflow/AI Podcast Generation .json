@@ -1,0 +1,310 @@
+{
+  "name": "AI Podcast Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        128
+      ],
+      "id": "c01c58f1-ec1d-48e4-851f-4de1f6f75b67",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "pTPQ2rTDZcZGfdsE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate the podcast script based on the parameters provided",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a professional podcast script writer.\n\nWrite a {{ $json.duration }} podcast episode about {{ $json.body.topic }}.\n\nVoice style: {{ $json.body.voiceStyle }}\n\nCRITICAL CHARACTER LIMITS - DO NOT EXCEED:\n- 2 minutes: Maximum 500 characters (about 75 words)\n- 5 minutes: Maximum 1200 characters (about 180 words)  \n- 10 minutes: Maximum 2500 characters (about 375 words)\n\nYou MUST stay under these character limits. Make the script conversational and engaging as if speaking directly to listeners in a podcast. Avoid headings or formatting. Output plain text only."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        -96
+      ],
+      "id": "0d5cc20a-4a95-42bc-a14e-e6c5ebd869dc",
+      "name": "AI Podcast Generator"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.murf.ai/v1/speech/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "ap2_c98db616-156e-423c-9574-289883d81c18"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Truncate Script if Needed').item.json.text }}"
+            },
+            {
+              "name": "voiceId",
+              "value": "={{ $json.voiceId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1232,
+        -96
+      ],
+      "id": "243cd1ad-8c2c-418e-964f-0b4fdc4fd145",
+      "name": "MURF AI generator"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.audioFile }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1456,
+        -96
+      ],
+      "id": "c7c22295-1fac-4d7b-98d4-f6a840903bf8",
+      "name": "Podcast link generator"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "9d1a248d-0713-4ef7-b916-14f5efb02ab9",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "421442e4-3f33-47d3-a80a-0015d14af3fb",
+      "name": "Webhook",
+      "webhookId": "9d1a248d-0713-4ef7-b916-14f5efb02ab9"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{\n{\n  \"script\": $('AI Podcast Generator').item.json.text,\n  \"audioUrl\": $json.audioFile\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1680,
+        -96
+      ],
+      "id": "1261bd4a-ac5e-4968-a6cd-4e86fc8dd601",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "duration",
+              "value": "={{ $json.body.length === 'short' ? '2 minutes' : $json.body.length === 'medium' ? '5 minutes' : '10 minutes' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b164ecb3-63ab-40bc-b289-87e13bab23f6",
+      "name": "Map Length to Duration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "voiceId",
+              "value": "={{ $('Webhook').item.json.body.voice === 'male' ? 'en-US-terrell' : $('Webhook').item.json.body.voice === 'female' ? 'en-US-natalie' : $('Webhook').item.json.body.voice === 'storytelling' ? 'en-US-marcus' : $('Webhook').item.json.body.voice === 'news' ? 'en-US-jason' : 'en-US-terrell' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "294b03af-cd67-4faf-b859-5f319273b0e2",
+      "name": "Map Voice to VoiceId",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "text",
+              "value": "={{ $json.text.substring(0, 2900) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "2c5fa312-12e1-45e1-a9eb-679937501670",
+      "name": "Truncate Script if Needed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Podcast Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Podcast Generator": {
+      "main": [
+        [
+          {
+            "node": "Truncate Script if Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MURF AI generator": {
+      "main": [
+        [
+          {
+            "node": "Podcast link generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Map Length to Duration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Podcast link generator": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Length to Duration": {
+      "main": [
+        [
+          {
+            "node": "AI Podcast Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Voice to VoiceId": {
+      "main": [
+        [
+          {
+            "node": "MURF AI generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Truncate Script if Needed": {
+      "main": [
+        [
+          {
+            "node": "Map Voice to VoiceId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ee54f5f5-e0db-4ef8-bbe6-dc47b31d77ad",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4286a3a3052f10abd350d5efcb4fcda79fb9b693f69181c813e0b6df55c5ad7"
+  },
+  "id": "tQlEzL8aEz9z48vX",
+  "tags": []
+}
